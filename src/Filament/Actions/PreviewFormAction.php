@@ -12,12 +12,15 @@ class PreviewFormAction
         return Action::make('preview')
             ->label('Preview')
             ->icon('heroicon-o-eye')
-            ->url(
-                fn(FormModel $record): string => url(
-                    trim(config('arqon-forms.route.prefix', 'forms'), '/') . '/' . $record->slug,
-                ),
-                shouldOpenInNewTab: true,
-            )
+            ->color('gray')
+            ->modalHeading(fn(FormModel $record): string => $record->name)
+            ->modalDescription(fn(FormModel $record): ?string => $record->description)
+            ->modalWidth('2xl')
+            ->modalSubmitAction(false)
+            ->modalCancelActionLabel('Close')
+            ->modalContent(fn(FormModel $record) => view('arqon-forms::filament.preview-modal', [
+                'form' => $record,
+            ]))
             ->visible(fn(?FormModel $record): bool => $record !== null);
     }
 }

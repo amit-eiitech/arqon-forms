@@ -3,27 +3,30 @@
 namespace Arqon\Forms\Services;
 
 use Arqon\Forms\Enums\FieldType;
+use Arqon\Forms\Mail\FormSubmissionNotification;
 use Arqon\Forms\Models\Form;
 use Arqon\Forms\Models\FormSubmission;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rule;
-use Throwable;
 use Illuminate\Validation\ValidationException;
-use Illuminate\Http\Request;
+use Throwable;
 
 class FormSubmissionService
 {
     /** @throws ValidationException */
-    public function submit(Form $form, array $input, ?Request $request = null): FormSubmission
+    public function submit(Form $form, array $input, ?Request $request = null, bool $enforceAvailability = true): FormSubmission
     {
-        abort_unless($form->acceptsSubmissions(), 404);
+        if ($enforceAvailability) {
+            abort_unless($form->acceptsSubmissions(), 404);
+        }
 
         $definitions = collect($form->fields ?? [])
-            ->filter(fn ($field) => is_array($field) && isset($field['name'], $field['type']) && is_string($field['type']) && FieldType::tryFrom($field['type']) !== null)
+            ->filter(fn($field) => is_array($field) && isset($field['name'], $field['type']) && is_string($field['type']) && FieldType::tryFrom($field['type']) !== null)
             ->values();
 
-        $names = $definitions->pluck('name')->filter(fn ($name) => is_string($name) && preg_match('/^[a-zA-Z][a-zA-Z0-9_]{0,63}$/', $name));
+        $names = $definitions->pluck('name')->filter(fn($name) => is_string($name) && preg_match('/^[a-zA-Z][a-zA-Z0-9_]{0,63}$/', $name));
         if ($names->count() !== $names->unique()->count() || $names->count() !== $definitions->count()) {
             throw ValidationException::withMessages(['form' => 'This form has an invalid field configuration. Please contact the site administrator.']);
         }
@@ -50,7 +53,7 @@ class FormSubmissionService
 
             if ($type === FieldType::Checkbox) {
                 $values = collect($field['options'] ?? [])->pluck('value')->filter()->values()->all();
-                $rules[$name.'.*'] = ['string', Rule::in($values)];
+                $rules[$name . '.*'] = ['string', Rule::in($values)];
             }
         }
 
@@ -97,26 +100,41 @@ class FormSubmissionService
         }
 
         $emails = collect(data_get($notification, 'emails', []))
-            ->filter(fn ($email) => filter_var($email, FILTER_VALIDATE_EMAIL))
+            ->filter(fn($email) => filter_var($email, FILTER_VALIDATE_EMAIL))
             ->unique()->values()->all();
 
         if ($emails === []) {
             return;
         }
 
-        $body = "A new submission was received for {$form->name}.\n\n";
-        foreach ($submission->field_snapshot ?? [] as $field) {
-            $label = $field['label'] ?? $field['name'] ?? 'Field';
-            $value = $submission->valueForField($field);
-            $body .= $label . ': ' . (is_array($value) ? implode(', ', $value) : (string) ($value ?? '')) . "\n";
-        }
-
-        $callback = fn () => Mail::raw($body, function ($message) use ($emails, $form): void {
-            $message->to($emails)->subject('New form submission: '.$form->name);
-        });
+        $delivery = strtolower((string) config('arqon-forms.notifications.delivery', 'sync'));
 
         try {
-            $callback();
+            $mailable = new FormSubmissionNotification($form, $submission);
+
+            if ($delivery === 'queue') {
+                $connection = config('arqon-forms.notifications.queue.connection');
+                $queue = config('arqon-forms.notifications.queue.queue');
+                $delaySeconds = (int) config('arqon-forms.notifications.queue.delay_seconds', 0);
+
+                if (is_string($connection) && $connection !== '') {
+                    $mailable->onConnection($connection);
+                }
+
+                if (is_string($queue) && $queue !== '') {
+                    $mailable->onQueue($queue);
+                }
+
+                if ($delaySeconds > 0) {
+                    $mailable->delay(now()->addSeconds($delaySeconds));
+                }
+
+                Mail::to($emails)->queue($mailable);
+
+                return;
+            }
+
+            Mail::to($emails)->send($mailable);
         } catch (Throwable $exception) {
             report($exception);
         }

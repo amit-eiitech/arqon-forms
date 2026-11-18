@@ -14,27 +14,45 @@ class PublicForm extends Component
     #[Locked]
     public int $formId;
 
+    #[Locked]
+    public bool $preview = false;
+
+    public bool $showHeading = true;
     public array $answers = [];
     public string $website = '';
     public bool $submitted = false;
 
-    public function mount(int $formId): void
+    public function mount(int $formId, bool $preview = false, bool $showHeading = true): void
     {
-        $form = Form::query()->active()->findOrFail($formId);
-        abort_unless($form->acceptsSubmissions(), 404);
+        $this->preview = $preview;
+        $this->showHeading = $showHeading;
+
+        $form = $preview
+            ? Form::query()->findOrFail($formId)
+            : Form::query()->active()->findOrFail($formId);
+
+        if (! $preview) {
+            abort_unless($form->acceptsSubmissions(), 404);
+        }
+
         $this->formId = $form->id;
     }
 
     public function submit(FormSubmissionService $service): void
     {
-        $form = Form::query()->active()->findOrFail($this->formId);
+        $form = $this->resolveFormForRendering();
 
         if ($this->website !== '') {
             $this->submitted = true;
             return;
         }
 
-        $key = 'arqon-forms:'.$form->id.':'.request()->ip();
+        if ($this->preview && ! config('arqon-forms.preview.allow_submissions', false)) {
+            $this->addError('form', 'Preview mode is enabled. Submissions are disabled for preview links.');
+            return;
+        }
+
+        $key = 'arqon-forms:' . $form->id . ':' . request()->ip();
         $max = (int) config('arqon-forms.submission.rate_limit.max_attempts', 5);
         $decay = (int) config('arqon-forms.submission.rate_limit.decay_minutes', 1);
 
@@ -46,11 +64,11 @@ class PublicForm extends Component
         RateLimiter::hit($key, $decay * 60);
 
         try {
-            $service->submit($form, $this->answers, request());
+            $service->submit($form, $this->answers, request(), enforceAvailability: ! $this->preview);
         } catch (ValidationException $exception) {
             foreach ($exception->errors() as $field => $messages) {
                 foreach ($messages as $message) {
-                    $this->addError('answers.'.$field, $message);
+                    $this->addError('answers.' . $field, $message);
                 }
             }
 
@@ -64,11 +82,22 @@ class PublicForm extends Component
 
     public function render()
     {
-        $form = Form::query()->active()->findOrFail($this->formId);
+        $form = $this->resolveFormForRendering();
 
         return view('arqon-forms::livewire.public-form', [
             'form' => $form,
             'fields' => $form->fields ?? [],
+            'showHeading' => $this->showHeading,
+            'preview' => $this->preview,
         ]);
+    }
+
+    protected function resolveFormForRendering(): Form
+    {
+        if ($this->preview) {
+            return Form::query()->findOrFail($this->formId);
+        }
+
+        return Form::query()->active()->findOrFail($this->formId);
     }
 }

@@ -24,7 +24,9 @@ class ArqonFormsServiceProvider extends ServiceProvider
         ], 'arqon-forms-config');
 
         $this->publishes([
-            __DIR__.'/../resources/views' => resource_path('views/vendor/arqon-forms'),
+            __DIR__.'/../resources/views/livewire/public-form.blade.php' => resource_path('views/vendor/arqon-forms/livewire/public-form.blade.php'),
+            __DIR__.'/../resources/views/public.blade.php' => resource_path('views/vendor/arqon-forms/public.blade.php'),
+            __DIR__.'/../resources/views/emails/submission-notification.blade.php' => resource_path('views/vendor/arqon-forms/emails/submission-notification.blade.php'),
         ], 'arqon-forms-views');
 
         $this->loadMigrationsFrom(__DIR__.'/../database/migrations');
@@ -39,5 +41,16 @@ class ArqonFormsServiceProvider extends ServiceProvider
         if (config('arqon-forms.route.enabled', true)) {
             $this->loadRoutesFrom(__DIR__.'/../routes/web.php');
         }
+    }
+
+    public static function getDistCss(): string
+    {
+        $path = __DIR__.'/../dist/arqon-forms.css';
+
+        if (file_exists($path)) {
+            return (string) file_get_contents($path);
+        }
+
+        return '';
     }
 }

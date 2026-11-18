@@ -275,6 +275,58 @@ class FormForm
                                             ->placeholder('e.g. 100')
                                             ->helperText('Maximum number of submissions allowed. Leave empty for unlimited submissions.'),
                                     ]),
+
+                                Fieldset::make('Page layout')
+                                    ->columns(2)
+                                    ->schema([
+                                        Toggle::make('settings.page.show_header')
+                                            ->label('Show page header')
+                                            ->default((bool) config('arqon-forms.render.show_header', true))
+                                            ->inline(false),
+
+                                        Toggle::make('settings.page.show_footer')
+                                            ->label('Show page footer')
+                                            ->default((bool) config('arqon-forms.render.show_footer', false))
+                                            ->inline(false),
+
+                                        TextInput::make('settings.page.header_title')
+                                            ->label('Header title override')
+                                            ->placeholder('Leave blank to use form name'),
+
+                                        TextInput::make('settings.page.header_subtitle')
+                                            ->label('Header subtitle override')
+                                            ->placeholder('Leave blank to use form description'),
+
+                                        Textarea::make('settings.page.footer_text')
+                                            ->label('Footer text')
+                                            ->rows(2)
+                                            ->columnSpanFull()
+                                            ->placeholder('Optional footer note for this form page'),
+                                    ]),
+
+                                Fieldset::make('Theme')
+                                    ->columns(2)
+                                    ->schema([
+                                        TextInput::make('settings.theme.primary_color')
+                                            ->label('Primary color')
+                                            ->placeholder((string) data_get(config('arqon-forms.render.theme'), 'primary_color', '#111827')),
+
+                                        TextInput::make('settings.theme.background_color')
+                                            ->label('Background color')
+                                            ->placeholder((string) data_get(config('arqon-forms.render.theme'), 'background_color', '#f5f5f5')),
+
+                                        TextInput::make('settings.theme.card_background_color')
+                                            ->label('Card background color')
+                                            ->placeholder((string) data_get(config('arqon-forms.render.theme'), 'card_background_color', '#ffffff')),
+
+                                        TextInput::make('settings.theme.text_color')
+                                            ->label('Text color')
+                                            ->placeholder((string) data_get(config('arqon-forms.render.theme'), 'text_color', '#222222')),
+
+                                        TextInput::make('settings.theme.radius')
+                                            ->label('Card radius')
+                                            ->placeholder((string) data_get(config('arqon-forms.render.theme'), 'radius', '12px')),
+                                    ]),
                             ]),
 
                         /*
