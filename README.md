@@ -1,5 +1,7 @@
 # Arqon Forms
 
+![Arqon Forms - Dynamic Forms for Laravel and Filament](docs/images/readme-hero.png)
+
 A lightweight, modern dynamic form builder and submission manager for **Laravel 13** and **Filament 5**.
 
 Package: `eii/arqon-forms`  
