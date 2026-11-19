@@ -29,7 +29,7 @@ class PublicForm extends Component
 
         $form = $preview
             ? Form::query()->findOrFail($formId)
-            : Form::query()->active()->findOrFail($formId);
+            : Form::query()->published()->findOrFail($formId);
 
         if (! $preview) {
             abort_unless($form->acceptsSubmissions(), 404);
@@ -98,6 +98,6 @@ class PublicForm extends Component
             return Form::query()->findOrFail($this->formId);
         }
 
-        return Form::query()->active()->findOrFail($this->formId);
+        return Form::query()->published()->findOrFail($this->formId);
     }
 }

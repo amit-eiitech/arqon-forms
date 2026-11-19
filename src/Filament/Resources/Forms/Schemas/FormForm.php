@@ -3,7 +3,7 @@
 namespace Arqon\Forms\Filament\Resources\Forms\Schemas;
 
 use Arqon\Forms\Enums\FieldType;
-use Arqon\Forms\Filament\Actions\PreviewFormAction;
+use Arqon\Forms\Enums\FormStatus;
 use Filament\Forms\Components\DateTimePicker;
 use Filament\Forms\Components\Hidden;
 use Filament\Forms\Components\Repeater;
@@ -72,11 +72,11 @@ class FormForm
                                     ->placeholder('Briefly describe the purpose of this form.')
                                     ->helperText('An optional description to help administrators understand this form.'),
 
-                                Toggle::make('is_active')
-                                    ->label('Published')
-                                    ->default(false)
-                                    ->inline(false)
-                                    ->helperText('When enabled, the form can accept public submissions.'),
+                                Select::make('status')
+                                    ->options(FormStatus::class)
+                                    ->default(FormStatus::Draft)
+                                    ->required()
+                                    ->helperText('Only published forms can accept public submissions.'),
                             ]),
 
                         /*
@@ -219,13 +219,13 @@ class FormForm
                             ]),
 
                         /*
-                             * BEHAVIOUR
+                             * CUSTOMIZATION
                              */
-                        Tab::make('Behaviour')
-                            ->icon('heroicon-o-clipboard-document-list')
+                        Tab::make('Customization')
+                            ->icon('heroicon-o-paint-brush')
                             ->columns(2)
                             ->schema([
-                                Fieldset::make('Submission experience')
+                                Fieldset::make('Submission messaging')
                                     ->columns(1)
                                     ->schema([
                                         TextInput::make('settings.submit_button')
@@ -242,18 +242,35 @@ class FormForm
                                             ->columnSpanFull()
                                             ->placeholder('Thank you for contacting us!')
                                             ->helperText('Displayed after a successful submission.'),
-
-                                        TextInput::make('settings.redirect_url')
-                                            ->label('Redirect URL')
-                                            ->url()
-                                            ->nullable()
-                                            ->columnSpanFull()
-                                            ->placeholder('https://example.com/thank-you')
-                                            ->helperText('Optional. Redirect visitors to another page after submission. Leave empty to display the success message instead.'),
                                     ]),
 
-                                Fieldset::make('Availability')
+                                Fieldset::make('Page content')
                                     ->columns(2)
+                                    ->schema([
+                                        TextInput::make('settings.page.header_title')
+                                            ->label('Header title override')
+                                            ->placeholder('Leave blank to use form name'),
+
+                                        TextInput::make('settings.page.header_subtitle')
+                                            ->label('Header subtitle override')
+                                            ->placeholder('Leave blank to use form description'),
+
+                                        Textarea::make('settings.page.footer_text')
+                                            ->label('Footer text')
+                                            ->rows(2)
+                                            ->columnSpanFull()
+                                            ->placeholder('Optional footer note for this form page'),
+                                    ]),
+                            ]),
+
+                        /*
+                             * Preferences
+                             */
+                        Tab::make('Preferences')
+                            ->icon('heroicon-o-adjustments-horizontal')
+                            ->schema([
+                                Fieldset::make('Availability')
+                                    ->columns(3)
                                     ->schema([
                                         DateTimePicker::make('settings.availability.starts_at')
                                             ->label('Available from')
@@ -276,81 +293,36 @@ class FormForm
                                             ->helperText('Maximum number of submissions allowed. Leave empty for unlimited submissions.'),
                                     ]),
 
-                                Fieldset::make('Page layout')
-                                    ->columns(2)
+                                Fieldset::make('After submission')
+                                    ->columns(1)
                                     ->schema([
-                                        Toggle::make('settings.page.show_header')
-                                            ->label('Show page header')
-                                            ->default((bool) config('arqon-forms.render.show_header', true))
-                                            ->inline(false),
-
-                                        Toggle::make('settings.page.show_footer')
-                                            ->label('Show page footer')
-                                            ->default((bool) config('arqon-forms.render.show_footer', false))
-                                            ->inline(false),
-
-                                        TextInput::make('settings.page.header_title')
-                                            ->label('Header title override')
-                                            ->placeholder('Leave blank to use form name'),
-
-                                        TextInput::make('settings.page.header_subtitle')
-                                            ->label('Header subtitle override')
-                                            ->placeholder('Leave blank to use form description'),
-
-                                        Textarea::make('settings.page.footer_text')
-                                            ->label('Footer text')
-                                            ->rows(2)
-                                            ->columnSpanFull()
-                                            ->placeholder('Optional footer note for this form page'),
+                                        TextInput::make('settings.redirect_url')
+                                            ->label('Redirect URL')
+                                            ->url()
+                                            ->nullable()
+                                            ->placeholder('https://example.com/thank-you')
+                                            ->helperText('Optional. Redirect visitors to another page after submission. Leave empty to display the success message instead.'),
                                     ]),
-
-                                Fieldset::make('Theme')
-                                    ->columns(2)
+                                Fieldset::make('Notifications')
+                                    ->columns(1)
                                     ->schema([
-                                        TextInput::make('settings.theme.primary_color')
-                                            ->label('Primary color')
-                                            ->placeholder((string) data_get(config('arqon-forms.render.theme'), 'primary_color', '#111827')),
+                                        Toggle::make('settings.notification.enabled')
+                                            ->label('Enable email notifications')
+                                            ->default(false)
+                                            ->inline(false)
+                                            ->live()
+                                            ->helperText('Send an email notification when a new response is received.'),
 
-                                        TextInput::make('settings.theme.background_color')
-                                            ->label('Background color')
-                                            ->placeholder((string) data_get(config('arqon-forms.render.theme'), 'background_color', '#f5f5f5')),
-
-                                        TextInput::make('settings.theme.card_background_color')
-                                            ->label('Card background color')
-                                            ->placeholder((string) data_get(config('arqon-forms.render.theme'), 'card_background_color', '#ffffff')),
-
-                                        TextInput::make('settings.theme.text_color')
-                                            ->label('Text color')
-                                            ->placeholder((string) data_get(config('arqon-forms.render.theme'), 'text_color', '#222222')),
-
-                                        TextInput::make('settings.theme.radius')
-                                            ->label('Card radius')
-                                            ->placeholder((string) data_get(config('arqon-forms.render.theme'), 'radius', '12px')),
+                                        TagsInput::make('settings.notification.emails')
+                                            ->label('Notification recipients')
+                                            ->placeholder('Enter an email address')
+                                            ->nestedRecursiveRules(['email'])
+                                            ->helperText('Add one or more email addresses that should receive submission notifications.')
+                                            ->visible(
+                                                fn(Get $get): bool =>
+                                                (bool) $get('settings.notification.enabled')
+                                            ),
                                     ]),
-                            ]),
-
-                        /*
-                             * NOTIFICATIONS
-                             */
-                        Tab::make('Notifications')
-                            ->icon('heroicon-o-bell')
-                            ->schema([
-                                Toggle::make('settings.notification.enabled')
-                                    ->label('Enable email notifications')
-                                    ->default(false)
-                                    ->inline(false)
-                                    ->live()
-                                    ->helperText('Send an email notification when a new response is received.'),
-
-                                TagsInput::make('settings.notification.emails')
-                                    ->label('Notification recipients')
-                                    ->placeholder('Enter an email address')
-                                    ->nestedRecursiveRules(['email'])
-                                    ->helperText('Add one or more email addresses that should receive submission notifications.')
-                                    ->visible(
-                                        fn(Get $get): bool =>
-                                        (bool) $get('settings.notification.enabled')
-                                    ),
                             ]),
                     ]),
             ]);

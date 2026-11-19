@@ -2,6 +2,7 @@
 
 namespace Arqon\Forms\Models;
 
+use Arqon\Forms\Enums\FormStatus;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -10,11 +11,15 @@ class Form extends Model
 {
     protected $table = 'arqon_forms';
 
-    protected $fillable = ['name', 'slug', 'description', 'fields', 'settings', 'is_active'];
+    protected $fillable = ['name', 'slug', 'description', 'fields', 'settings', 'status'];
 
     protected function casts(): array
     {
-        return ['fields' => 'array', 'settings' => 'array', 'is_active' => 'boolean'];
+        return [
+            'fields' => 'array',
+            'settings' => 'array',
+            'status' => FormStatus::class,
+        ];
     }
 
     public function submissions(): HasMany
@@ -22,9 +27,9 @@ class Form extends Model
         return $this->hasMany(FormSubmission::class, 'form_id');
     }
 
-    public function scopeActive(Builder $query): Builder
+    public function scopePublished(Builder $query): Builder
     {
-        return $query->where('is_active', true);
+        return $query->where('status', FormStatus::Published);
     }
 
     public function setting(string $key, mixed $default = null): mixed
@@ -34,7 +39,7 @@ class Form extends Model
 
     public function acceptsSubmissions(): bool
     {
-        if (! $this->is_active) {
+        if ($this->status !== FormStatus::Published) {
             return false;
         }
 

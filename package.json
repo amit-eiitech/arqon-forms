@@ -6,7 +6,7 @@
     "dev": "tailwindcss -i ./resources/css/arqon-forms.css -o ./dist/arqon-forms.css --watch"
   },
   "devDependencies": {
-    "@tailwindcss/cli": "^4.0.0",
-    "tailwindcss": "^4.0.0"
+    "@tailwindcss/cli": "^4.3.5",
+    "tailwindcss": "^4.3.5"
   }
 }

@@ -4,6 +4,7 @@ namespace Arqon\Forms\Filament\Resources\Forms\Pages;
 
 use Arqon\Forms\Filament\Actions\PreviewFormAction;
 use Arqon\Forms\Filament\Resources\Forms\FormResource;
+use Arqon\Forms\Support\FormSettingsNormalizer;
 use Filament\Actions\DeleteAction;
 use Filament\Resources\Pages\EditRecord;
 
@@ -20,9 +21,7 @@ class EditForm extends EditRecord
             }
         }
         $data['fields'] = array_values($data['fields'] ?? []);
-        $rawEmails = data_get($data, 'settings.notification.emails', []);
-        $emails = is_array($rawEmails) ? $rawEmails : preg_split('/[,;\s]+/', (string) $rawEmails, -1, PREG_SPLIT_NO_EMPTY);
-        data_set($data, 'settings.notification.emails', $emails ?: []);
+        $data['settings'] = FormSettingsNormalizer::normalize($data['settings'] ?? []);
 
         return $data;
     }

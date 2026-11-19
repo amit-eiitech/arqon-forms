@@ -14,7 +14,7 @@ return new class extends Migration {
             $table->text('description')->nullable();
             $table->json('fields');
             $table->json('settings')->nullable();
-            $table->boolean('is_active')->default(false)->index();
+            $table->string('status')->default('draft')->index();
             $table->timestamps();
         });
     }

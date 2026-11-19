@@ -12,7 +12,7 @@ class ArqonForm extends Component
 
     public function render(): Closure
     {
-        $form = Form::query()->active()->where('slug', $this->slug)->firstOrFail();
+        $form = Form::query()->published()->where('slug', $this->slug)->firstOrFail();
         abort_unless($form->acceptsSubmissions(), 404);
 
         return fn () => '<livewire:arqon-forms.public-form :form-id="' . $form->id . '" />';

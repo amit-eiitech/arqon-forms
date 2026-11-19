@@ -2,13 +2,14 @@
 
 namespace Arqon\Forms\Filament\Resources\Forms\Tables;
 
-use Arqon\Forms\Filament\Actions\PreviewFormAction;
+use Arqon\Forms\Enums\FormStatus;
+use Arqon\Forms\Models\Form;
+use Filament\Actions\Action;
 use Filament\Actions\ActionGroup;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\EditAction;
-use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
-use Filament\Tables\Filters\TernaryFilter;
+use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
 
 class FormTable
@@ -22,7 +23,7 @@ class FormTable
                     ->sortable(),
 
                 TextColumn::make('slug')
-                    ->copyable(),
+                    ->searchable(),
 
                 TextColumn::make('submissions_count')
                     ->label('Submissions')
@@ -30,10 +31,8 @@ class FormTable
                     ->alignCenter()
                     ->sortable(),
 
-                IconColumn::make('is_active')
-                    ->label('Published')
-                    ->boolean()
-                    ->alignCenter(),
+                TextColumn::make('status')
+                    ->badge(),
 
                 TextColumn::make('created_at')
                     ->dateTime()
@@ -47,11 +46,19 @@ class FormTable
 
             ])
             ->filters([
-                TernaryFilter::make('is_active')
-                    ->label('Published')
+                SelectFilter::make('status')
+                    ->options(FormStatus::class)
             ])
             ->recordActions([
-                PreviewFormAction::make(),
+                Action::make('open_public_form')
+                    ->label('Go to published page')
+                    ->icon('heroicon-o-arrow-top-right-on-square')
+                    ->url(fn(Form $record): string => route(
+                        config('arqon-forms.route.name_prefix', 'arqon-forms.') . 'show',
+                        ['slug' => $record->slug],
+                    ))
+                    ->openUrlInNewTab()
+                    ->visible(fn(Form $record): bool => $record->status === FormStatus::Published),
 
                 ActionGroup::make([
                     EditAction::make()

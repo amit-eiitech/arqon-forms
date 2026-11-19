@@ -1,7 +1,4 @@
-@layer theme, base, components, utilities;
-
-@import "tailwindcss/theme" layer(theme);
-@import "tailwindcss/utilities" layer(utilities);
+@import 'tailwindcss';
 
 @custom-variant dark (&:where(.dark, .dark *));
 
@@ -9,6 +6,7 @@
 @source "../../src";
 
 @theme {
+  --font-sans: "Inter", Arial, Helvetica, sans-serif;
   --color-primary-50: #f0fdf4;
   --color-primary-100: #dcfce7;
   --color-primary-200: #bbf7d0;
@@ -20,4 +18,140 @@
   --color-primary-800: #166534;
   --color-primary-900: #14532d;
   --color-primary-950: #052e16;
+}
+
+body {
+  @apply font-sans;
+}
+
+/* Keep these unlayered so host-app and Filament CSS layers cannot override form styles. */
+.arqon-success-message {
+  @apply rounded-xl border border-green-200 bg-green-50 p-6 text-green-900 dark:border-green-800 dark:bg-green-950/50 dark:text-green-200;
+}
+
+.arqon-success-content {
+  @apply flex items-start gap-3;
+}
+
+.arqon-success-icon {
+  @apply h-6 w-6 shrink-0 text-green-600 dark:text-green-400;
+}
+
+.arqon-success-title {
+  @apply text-base font-semibold;
+}
+
+.arqon-success-text {
+  @apply text-sm text-green-800 dark:text-green-300;
+}
+
+.arqon-form-title {
+  @apply text-2xl font-bold tracking-tight text-gray-900 dark:text-white;
+}
+
+.arqon-form-description {
+  @apply text-sm text-gray-500 dark:text-gray-400;
+}
+
+.arqon-form {
+  @apply w-full space-y-6;
+}
+
+.arqon-honeypot {
+  @apply hidden;
+}
+
+.arqon-label {
+  @apply block mb-1 text-sm font-medium text-gray-700 dark:text-gray-200;
+}
+
+.arqon-required {
+  @apply text-red-500;
+}
+
+.arqon-help-text {
+  @apply mt-1 text-xs text-gray-500 dark:text-gray-400;
+}
+
+.arqon-input,
+.arqon-textarea,
+.arqon-select {
+  @apply block w-full min-h-10 rounded-lg border border-gray-950/10 bg-white px-3 py-1.5 text-base text-gray-950 shadow-2xs outline-none transition duration-75 placeholder:text-gray-400 focus:border-primary-600 focus:ring-2 focus:ring-primary-600/20 disabled:pointer-events-none disabled:bg-gray-50 disabled:text-gray-500 sm:text-sm/6 dark:border-white/15 dark:bg-white/5 dark:text-white dark:placeholder:text-gray-500 dark:focus:border-primary-500 dark:focus:ring-primary-500/25 dark:disabled:bg-white/2 dark:disabled:text-gray-500 mb-6;
+}
+
+.arqon-textarea {
+  @apply py-2;
+}
+
+.arqon-choice-list {
+  @apply space-y-2.5 space-x-6 mb-6;
+}
+
+.arqon-choice-label {
+  @apply inline-flex cursor-pointer items-center gap-2.5 text-sm/6 font-medium text-gray-950 select-none dark:text-gray-100;
+}
+
+.arqon-checkbox,
+.arqon-radio {
+  @apply size-4 shrink-0 border border-gray-950/20 bg-white text-primary-600 shadow-2xs transition duration-75 focus:ring-2 focus:ring-primary-600/20 focus:ring-offset-0 disabled:cursor-not-allowed disabled:opacity-50 dark:border-white/20 dark:bg-white/5 dark:text-primary-500 dark:checked:border-primary-500 dark:checked:bg-primary-500 dark:focus:ring-primary-500/25;
+}
+
+.arqon-checkbox {
+  @apply rounded-sm;
+}
+
+.arqon-radio {
+  @apply rounded-full;
+}
+
+.arqon-field-error {
+  @apply mt-1.5 text-sm/5 text-red-600 dark:text-red-400;
+}
+
+.arqon-form-error {
+  @apply rounded-xl border border-red-600/20 bg-red-50/75 p-4 text-sm/6 text-red-700 shadow-2xs dark:border-red-500/25 dark:bg-red-500/10 dark:text-red-300;
+}
+
+.arqon-submit-button {
+  @apply inline-flex cursor-pointer items-center justify-center gap-1.5 rounded-lg bg-primary-600 px-3.5 py-2 text-sm font-semibold whitespace-nowrap text-white shadow-2xs transition duration-75 hover:bg-primary-500 focus-visible:ring-2 focus-visible:ring-primary-600/50 focus-visible:outline-none disabled:pointer-events-none disabled:opacity-60 dark:bg-primary-500 dark:hover:bg-primary-400 dark:focus-visible:ring-primary-400/50;
+}
+
+.arqon-submit-loading {
+  @apply inline-flex shrink-0 flex-row items-center gap-1.5 whitespace-nowrap;
+}
+
+.arqon-submit-spinner {
+  @apply inline-block size-4 shrink-0 animate-spin text-current;
+}
+
+.arqon-spinner-track {
+  @apply opacity-25;
+}
+
+.arqon-spinner-head {
+  @apply opacity-75;
+}
+
+.arqon-preview-banner {
+  @apply p-4 rounded-lg border border-amber-200 bg-amber-50 text-sm text-amber-800 dark:border-amber-800 dark:bg-amber-950/50 dark:text-amber-300;
+}
+
+.arqon-form-card {
+  @apply p-6 sm:p-8 rounded-2xl border border-gray-200 bg-white shadow-sm dark:border-gray-800 dark:bg-gray-900;
+}
+
+.arqon-page-header {
+  @apply pb-5 border-b border-gray-100 dark:border-gray-800;
+}
+
+.arqon-page-title {
+  @apply text-2xl font-bold tracking-tight text-gray-900 dark:text-white;
+}
+
+.arqon-page-subtitle {
+  @apply text-sm text-gray-500 dark:text-gray-400;
+}
+
+.arqon-page-footer {
+  @apply pt-4 border-t border-gray-100 text-xs text-gray-400 dark:border-gray-800 dark:text-gray-500;
 }

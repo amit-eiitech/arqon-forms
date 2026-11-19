@@ -27,7 +27,8 @@ class PreviewFormActionTest extends TestCase
         self::assertSame('preview', $action->getName());
         self::assertSame('Preview', $action->getLabel());
         self::assertSame('heroicon-o-eye', $action->getIcon());
-        self::assertSame('Close', $action->getModalCancelActionLabel());
+        self::assertNull($action->getModalCancelAction());
+        self::assertTrue($action->hasModalCloseButton());
         self::assertNull($action->getModalSubmitAction());
     }
 

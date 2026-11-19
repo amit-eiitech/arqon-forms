@@ -3,6 +3,8 @@
 namespace Arqon\Forms\Filament\Resources\Submissions\Tables;
 
 use Arqon\Forms\Enums\SubmissionStatus;
+use Arqon\Forms\Filament\Actions\MarkSubmissionAsReadAction;
+use Arqon\Forms\Filament\Actions\MarkSubmissionAsRepliedAction;
 use Arqon\Forms\Models\FormSubmission;
 use Filament\Actions\Action;
 use Filament\Actions\ActionGroup;
@@ -19,6 +21,10 @@ class SubmissionTable
     {
         return $table
             ->columns([
+                TextColumn::make('id')
+                    ->label('#')
+                    ->sortable(),
+
                 TextColumn::make('form.name')
                     ->label('Form')
                     ->searchable()
@@ -41,22 +47,18 @@ class SubmissionTable
                     ->relationship('form', 'name'),
             ])
             ->recordActions([
+                MarkSubmissionAsReadAction::make(),
+                MarkSubmissionAsRepliedAction::make(),
                 ActionGroup::make([
                     ActionGroup::make([
                         ViewAction::make()
                             ->label('View submission')
                             ->icon('heroicon-o-eye'),
 
-                        Action::make('markRead')
-                            ->label('Mark read')
-                            ->icon('heroicon-o-check')
-                            ->visible(fn(FormSubmission $record) => $record->status === SubmissionStatus::New->value)
-                            ->action(fn(FormSubmission $record) => $record->update(['status' => SubmissionStatus::Read->value, 'handled_at' => now()])),
-
                         Action::make('archive')
                             ->label('Archive')
                             ->icon('heroicon-o-archive-box')
-                            ->visible(fn(FormSubmission $record) => $record->status !== SubmissionStatus::Archived->value)
+                            ->visible(fn(FormSubmission $record) => $record->status !== SubmissionStatus::Archived)
                             ->action(fn(FormSubmission $record) => $record->update(['status' => SubmissionStatus::Archived->value, 'handled_at' => now()])),
                     ])->dropdown(false),
 

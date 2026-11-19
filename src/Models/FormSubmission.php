@@ -2,6 +2,7 @@
 
 namespace Arqon\Forms\Models;
 
+use Arqon\Forms\Enums\SubmissionStatus;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
@@ -27,6 +28,7 @@ class FormSubmission extends Model
             'field_snapshot' => 'array',
             'submitted_at' => 'datetime',
             'handled_at' => 'datetime',
+            'status' => SubmissionStatus::class,
         ];
     }
 

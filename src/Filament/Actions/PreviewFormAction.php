@@ -17,7 +17,8 @@ class PreviewFormAction
             ->modalDescription(fn(FormModel $record): ?string => $record->description)
             ->modalWidth('2xl')
             ->modalSubmitAction(false)
-            ->modalCancelActionLabel('Close')
+            ->modalCloseButton(true)
+            ->modalCancelAction(false)
             ->modalContent(fn(FormModel $record) => view('arqon-forms::filament.preview-modal', [
                 'form' => $record,
             ]))

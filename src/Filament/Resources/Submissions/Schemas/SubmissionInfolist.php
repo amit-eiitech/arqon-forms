@@ -2,9 +2,7 @@
 
 namespace Arqon\Forms\Filament\Resources\Submissions\Schemas;
 
-use Arqon\Forms\Filament\Resources\Forms\FormResource;
 use Arqon\Forms\Models\FormSubmission;
-use Filament\Actions\Action;
 use Filament\Infolists\Components\TextEntry;
 use Filament\Schemas\Components\Grid;
 use Filament\Schemas\Components\Section;

@@ -74,7 +74,7 @@ public function panel(Panel $panel): Panel
 1. Navigate to **Forms → Forms** in your Filament panel.
 2. Click **New Form** and add your fields using the visual builder.
 3. Use clean snake_case field identifiers (e.g., `full_name`, `company_email`).
-4. Toggle **Published** to make the form active, then save.
+4. Set the form status to **Published**, then save.
 5. Your form is now accessible via `/forms/{slug}` or ready to embed in any page.
 
 ---
@@ -83,7 +83,8 @@ public function panel(Panel $panel): Panel
 
 Arqon Forms includes an **In-Panel Modal Preview**:
 
-- Clicking the **Preview** action on any form row or edit page opens a modal showing the live form.
+- Clicking **Preview** on the edit page opens a modal showing the live form.
+- Published forms have an **Open public form** action in the forms table.
 - The preview runs the real Livewire component with submissions disabled to prevent test pollution.
 - The modal matches your Filament panel theme with zero style bleed, honoring light and dark mode automatically.
 - Optional temporary signed preview URLs (`/forms/_preview/{id}`) remain available for external reviewers if enabled in config.
@@ -195,10 +196,9 @@ To queue notifications asynchronously:
 
 ```dotenv
 ARQON_FORMS_NOTIFICATION_DELIVERY=queue
-ARQON_FORMS_NOTIFICATION_QUEUE_CONNECTION=redis
-ARQON_FORMS_NOTIFICATION_QUEUE=default
-ARQON_FORMS_NOTIFICATION_QUEUE_DELAY_SECONDS=0
 ```
+
+Queued notifications use Laravel's configured default queue connection and queue.
 
 ---
 

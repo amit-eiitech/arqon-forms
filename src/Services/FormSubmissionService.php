@@ -113,22 +113,6 @@ class FormSubmissionService
             $mailable = new FormSubmissionNotification($form, $submission);
 
             if ($delivery === 'queue') {
-                $connection = config('arqon-forms.notifications.queue.connection');
-                $queue = config('arqon-forms.notifications.queue.queue');
-                $delaySeconds = (int) config('arqon-forms.notifications.queue.delay_seconds', 0);
-
-                if (is_string($connection) && $connection !== '') {
-                    $mailable->onConnection($connection);
-                }
-
-                if (is_string($queue) && $queue !== '') {
-                    $mailable->onQueue($queue);
-                }
-
-                if ($delaySeconds > 0) {
-                    $mailable->delay(now()->addSeconds($delaySeconds));
-                }
-
                 Mail::to($emails)->queue($mailable);
 
                 return;

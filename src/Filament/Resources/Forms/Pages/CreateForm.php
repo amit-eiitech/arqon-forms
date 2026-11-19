@@ -3,6 +3,7 @@
 namespace Arqon\Forms\Filament\Resources\Forms\Pages;
 
 use Arqon\Forms\Filament\Resources\Forms\FormResource;
+use Arqon\Forms\Support\FormSettingsNormalizer;
 use Filament\Resources\Pages\CreateRecord;
 
 class CreateForm extends CreateRecord
@@ -12,7 +13,7 @@ class CreateForm extends CreateRecord
     protected function mutateFormDataBeforeCreate(array $data): array
     {
         $data['fields'] = $this->normalizeFields($data['fields'] ?? []);
-        $data['settings'] = $this->normalizeSettings($data['settings'] ?? []);
+        $data['settings'] = FormSettingsNormalizer::normalize($data['settings'] ?? []);
 
         return $data;
     }
@@ -28,11 +29,4 @@ class CreateForm extends CreateRecord
         return array_values($fields);
     }
 
-    private function normalizeSettings(array $settings): array
-    {
-        $rawEmails = data_get($settings, 'notification.emails', []);
-        $emails = is_array($rawEmails) ? $rawEmails : preg_split('/[,;\s]+/', (string) $rawEmails, -1, PREG_SPLIT_NO_EMPTY);
-        data_set($settings, 'notification.emails', $emails ?: []);
-        return $settings;
-    }
 }

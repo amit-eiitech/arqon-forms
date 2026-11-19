@@ -3,6 +3,9 @@
 namespace Arqon\Forms\Tests\Feature;
 
 use Arqon\Forms\ArqonFormsServiceProvider;
+use Arqon\Forms\Enums\FormStatus;
+use Arqon\Forms\Enums\SubmissionStatus;
+use Arqon\Forms\Filament\Actions\MarkSubmissionAsReadAction;
 use Arqon\Forms\Models\Form;
 use Illuminate\Support\Facades\URL;
 use Livewire\LivewireServiceProvider;
@@ -40,6 +43,11 @@ class PublicPageRenderTest extends TestCase
         $this->get($url)
             ->assertOk()
             ->assertSee('Preview mode')
+            ->assertSee('arqon-form-card')
+            ->assertSee('arqon-label')
+            ->assertSee('arqon-textarea')
+            ->assertSee('.arqon-input', false)
+            ->assertSee('.arqon-form-card', false)
             ->assertSee($form->name);
     }
 
@@ -62,6 +70,7 @@ class PublicPageRenderTest extends TestCase
             $this->get($url)
                 ->assertOk()
                 ->assertSee('LAYOUT-WRAPPER')
+                ->assertSee('.arqon-input', false)
                 ->assertSee('Preview mode');
         } finally {
             @unlink($viewPath.'/arqon-test-layout.blade.php');
@@ -70,9 +79,81 @@ class PublicPageRenderTest extends TestCase
 
     public function test_public_page_returns_not_found_for_inactive_form(): void
     {
-        $form = $this->createForm(['is_active' => false]);
+        $form = $this->createForm(['status' => 'draft']);
 
         $this->get('/forms/'.$form->slug)->assertNotFound();
+    }
+
+    public function test_public_page_includes_form_component_styles(): void
+    {
+        $form = $this->createForm();
+
+        $this->get('/forms/'.$form->slug)
+            ->assertOk()
+            ->assertSee('arqon-textarea')
+            ->assertSee('.arqon-input', false);
+    }
+
+    public function test_form_status_is_cast_to_enum_and_draft_forms_are_not_public(): void
+    {
+        $form = $this->createForm(['status' => FormStatus::Draft->value]);
+
+        self::assertSame(FormStatus::Draft, $form->status);
+
+        $this->get('/forms/'.$form->slug)->assertNotFound();
+    }
+
+    public function test_blank_page_overrides_fall_back_to_form_name_and_description(): void
+    {
+        $form = $this->createForm([
+            'description' => 'The form description',
+            'settings' => [
+                'page' => [
+                    'header_title' => '',
+                    'header_subtitle' => '  ',
+                ],
+            ],
+        ]);
+
+        $this->get('/forms/'.$form->slug)
+            ->assertOk()
+            ->assertSee($form->name)
+            ->assertSee('The form description');
+    }
+
+    public function test_blank_submit_button_text_uses_default_label(): void
+    {
+        $form = $this->createForm([
+            'settings' => [
+                'submit_button' => '',
+            ],
+        ]);
+
+        $this->get('/forms/'.$form->slug)
+            ->assertOk()
+            ->assertSee('>Submit</span>', false);
+    }
+
+    public function test_mark_as_read_action_updates_submission_status_and_handled_at(): void
+    {
+        $form = $this->createForm();
+        $submission = $form->submissions()->create([
+            'data' => [],
+            'field_snapshot' => [],
+            'status' => SubmissionStatus::New,
+            'submitted_at' => now(),
+        ]);
+        $action = MarkSubmissionAsReadAction::make()->record($submission);
+
+        self::assertTrue($action->isVisible());
+
+        $handler = $action->getActionFunction();
+        self::assertNotNull($handler);
+        $handler($submission);
+
+        $submission->refresh();
+        self::assertSame(SubmissionStatus::Read, $submission->status);
+        self::assertNotNull($submission->handled_at);
     }
 
     /**
@@ -83,7 +164,7 @@ class PublicPageRenderTest extends TestCase
         return Form::create(array_merge([
             'name' => 'Feedback',
             'slug' => 'feedback',
-            'is_active' => true,
+            'status' => FormStatus::Published->value,
             'fields' => [
                 ['name' => 'comments', 'type' => 'textarea', 'label' => 'Comments', 'required' => false],
             ],

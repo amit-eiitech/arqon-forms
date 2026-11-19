@@ -29,16 +29,16 @@ enum SubmissionStatus: string implements HasLabel, HasColor
     {
         return match ($this) {
             self::New => 'info',
-            self::Read => 'gray',
+            self::Read => 'warning',
             self::Replied => 'success',
-            self::Archived => 'warning',
+            self::Archived => 'gray',
         };
     }
 
     public static function options(): array
     {
         return collect(self::cases())
-            ->mapWithKeys(fn (self $status) => [$status->value => $status->getLabel()])
+            ->mapWithKeys(fn(self $status) => [$status->value => $status->getLabel()])
             ->all();
     }
 }
