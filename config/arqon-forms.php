@@ -43,25 +43,14 @@ return [
     | Customize navigation and action icons used across Filament resources.
     | Values can be Heroicon enums (e.g. Heroicon::OutlinedDocumentText)
     | or icon string identifiers (e.g. 'heroicon-o-document-text').
-    | When set to null, the package defaults from HasPackageIcons are used.
+    | When not configured, the package defaults from HasPackageIcons are used.
+    | When set to null, the icons will not be used.
+    | Check all available options in README.md file.
     |
     */
     'icons' => [
         // Navigation Icons
-        'form' => null,
-        'submissions' => null,
-        'settings' => null,
-
-        // Action Icons
-        'create' => null,
-        'edit' => null,
-        'delete' => null,
-        'view' => null,
-        'preview' => null,
-        'open_public_form' => null,
-        'mark_as_read' => null,
-        'mark_as_replied' => null,
-        'archive' => null,
-        'export_csv' => null,
+        // 'form' => Heroicon::OutlinedDocumentText,
+        // 'submissions' => Heroicon::OutlinedInbox,
     ],
 ];
