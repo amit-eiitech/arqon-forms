@@ -7,7 +7,6 @@ use Arqon\Forms\Enums\FormStatus;
 use Arqon\Forms\Enums\SubmissionStatus;
 use Arqon\Forms\Filament\Actions\MarkSubmissionAsReadAction;
 use Arqon\Forms\Models\Form;
-use Illuminate\Support\Facades\URL;
 use Livewire\LivewireServiceProvider;
 use Orchestra\Testbench\TestCase;
 
@@ -34,15 +33,12 @@ class PublicPageRenderTest extends TestCase
         $this->loadMigrationsFrom(__DIR__.'/../../database/migrations');
     }
 
-    public function test_preview_page_renders_when_no_layout_is_configured(): void
+    public function test_public_page_renders_when_no_layout_is_configured(): void
     {
         $form = $this->createForm();
 
-        $url = URL::temporarySignedRoute('arqon-forms.preview', now()->addMinutes(30), ['form' => $form->getKey()]);
-
-        $this->get($url)
+        $this->get('/forms/'.$form->slug)
             ->assertOk()
-            ->assertSee('Preview mode')
             ->assertSee('arqon-form-card')
             ->assertSee('arqon-label')
             ->assertSee('arqon-textarea')
@@ -51,7 +47,7 @@ class PublicPageRenderTest extends TestCase
             ->assertSee($form->name);
     }
 
-    public function test_preview_page_renders_inside_a_configured_layout(): void
+    public function test_public_page_renders_inside_a_configured_layout(): void
     {
         $form = $this->createForm();
 
@@ -65,13 +61,10 @@ class PublicPageRenderTest extends TestCase
             $this->app['view']->addLocation($viewPath);
             $this->app['config']->set('arqon-forms.render.layout', 'arqon-test-layout');
 
-            $url = URL::temporarySignedRoute('arqon-forms.preview', now()->addMinutes(30), ['form' => $form->getKey()]);
-
-            $this->get($url)
+            $this->get('/forms/'.$form->slug)
                 ->assertOk()
                 ->assertSee('LAYOUT-WRAPPER')
-                ->assertSee('.arqon-input', false)
-                ->assertSee('Preview mode');
+                ->assertSee('.arqon-input', false);
         } finally {
             @unlink($viewPath.'/arqon-test-layout.blade.php');
         }

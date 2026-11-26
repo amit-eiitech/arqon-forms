@@ -4,6 +4,7 @@ namespace Arqon\Forms\Filament\Resources\Forms\Tables;
 
 use Arqon\Forms\Enums\FormStatus;
 use Arqon\Forms\Models\Form;
+use Arqon\Forms\Traits\HasPackageIcons;
 use Filament\Actions\Action;
 use Filament\Actions\ActionGroup;
 use Filament\Actions\DeleteAction;
@@ -14,6 +15,8 @@ use Filament\Tables\Table;
 
 class FormTable
 {
+    use HasPackageIcons;
+
     public static function configure(Table $table): Table
     {
         return $table
@@ -52,7 +55,7 @@ class FormTable
             ->recordActions([
                 Action::make('open_public_form')
                     ->label('Go to published page')
-                    ->icon('heroicon-o-arrow-top-right-on-square')
+                    ->icon(static::packageIcon('open_public_form'))
                     ->url(fn(Form $record): string => route(
                         config('arqon-forms.route.name_prefix', 'arqon-forms.') . 'show',
                         ['slug' => $record->slug],
@@ -62,9 +65,9 @@ class FormTable
 
                 ActionGroup::make([
                     EditAction::make()
-                        ->icon('heroicon-o-pencil-square'),
+                        ->icon(static::packageIcon('edit')),
                     DeleteAction::make()
-                        ->icon('heroicon-o-trash'),
+                        ->icon(static::packageIcon('delete')),
                 ]),
             ])
             ->defaultSort('created_at', 'desc');

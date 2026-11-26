@@ -9,6 +9,8 @@ use Arqon\Forms\Filament\Resources\Forms\Pages\ListForms;
 use Arqon\Forms\Filament\Resources\Forms\Schemas\FormForm;
 use Arqon\Forms\Filament\Resources\Forms\Tables\FormTable;
 use Arqon\Forms\Models\Form as FormModel;
+use Arqon\Forms\Traits\HasPackageIcons;
+use BackedEnum;
 use Filament\Actions\Action;
 use Filament\Actions\DeleteAction;
 use Filament\Forms\Components\KeyValue;
@@ -28,9 +30,14 @@ use Filament\Tables\Table;
 
 class FormResource extends Resource
 {
+    use HasPackageIcons;
+
     protected static ?string $model = FormModel::class;
 
-    protected static string | \BackedEnum | null $navigationIcon = 'heroicon-o-rectangle-stack';
+    public static function getNavigationIcon(): string|BackedEnum|null
+    {
+        return static::packageIcon('form');
+    }
 
     protected static ?string $recordTitleAttribute = 'name';
 

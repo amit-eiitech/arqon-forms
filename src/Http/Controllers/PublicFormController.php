@@ -14,16 +14,6 @@ class PublicFormController extends Controller
 
         abort_unless($form->acceptsSubmissions(), 404);
 
-        return $this->renderFormPage($form, false);
-    }
-
-    public function preview(Form $form): View
-    {
-        return $this->renderFormPage($form, true);
-    }
-
-    protected function renderFormPage(Form $form, bool $previewMode): View
-    {
         $configuredLayout = config('arqon-forms.render.layout');
         $layout = is_string($configuredLayout) && $configuredLayout !== '' && view()->exists($configuredLayout)
             ? $configuredLayout
@@ -34,7 +24,6 @@ class PublicFormController extends Controller
 
         return view('arqon-forms::public', [
             'form' => $form,
-            'previewMode' => $previewMode,
             'layout' => $layout,
             'section' => $section,
         ]);

@@ -6,6 +6,7 @@ use Arqon\Forms\Enums\SubmissionStatus;
 use Arqon\Forms\Filament\Actions\MarkSubmissionAsReadAction;
 use Arqon\Forms\Filament\Actions\MarkSubmissionAsRepliedAction;
 use Arqon\Forms\Models\FormSubmission;
+use Arqon\Forms\Traits\HasPackageIcons;
 use Filament\Actions\Action;
 use Filament\Actions\ActionGroup;
 use Filament\Actions\DeleteAction;
@@ -17,6 +18,8 @@ use Symfony\Component\HttpFoundation\StreamedResponse;
 
 class SubmissionTable
 {
+    use HasPackageIcons;
+
     public static function configure(Table $table): Table
     {
         return $table
@@ -53,21 +56,21 @@ class SubmissionTable
                     ActionGroup::make([
                         ViewAction::make()
                             ->label('View submission')
-                            ->icon('heroicon-o-eye'),
+                            ->icon(static::packageIcon('view')),
 
                         Action::make('archive')
                             ->label('Archive')
-                            ->icon('heroicon-o-archive-box')
+                            ->icon(static::packageIcon('archive'))
                             ->visible(fn(FormSubmission $record) => $record->status !== SubmissionStatus::Archived)
                             ->action(fn(FormSubmission $record) => $record->update(['status' => SubmissionStatus::Archived->value, 'handled_at' => now()])),
                     ])->dropdown(false),
 
                     DeleteAction::make()
-                        ->icon('heroicon-o-trash'),
+                        ->icon(static::packageIcon('delete')),
                 ]),
             ])
             ->headerActions([
-                Action::make('exportCsv')->label('Export CSV')->icon('heroicon-o-arrow-down-tray')
+                Action::make('exportCsv')->label('Export CSV')->icon(static::packageIcon('export_csv'))
                     ->action(fn(): StreamedResponse => static::exportCsv()),
             ])
             ->defaultSort('submitted_at', 'desc');

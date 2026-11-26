@@ -6,12 +6,6 @@
     </style>
 
     <div class="mx-auto max-w-3xl px-4 py-8 sm:px-6 lg:px-8">
-        @if ($previewMode ?? false)
-            <div class="arqon-preview-banner mb-6">
-                Preview mode: this is a temporary signed preview page.
-            </div>
-        @endif
-
         <div class="arqon-form-card">
             @php($headerTitle = data_get($form->settings ?? [], 'page.header_title'))
             <header class="arqon-page-header mb-6">
@@ -27,7 +21,7 @@
                 @endif
             </header>
 
-            <livewire:arqon-forms.public-form :form-id="$form->id" :preview="$previewMode ?? false" :show-heading="false" />
+            <livewire:arqon-forms.public-form :form-id="$form->id" :show-heading="false" />
 
             @php($footerText = data_get($form->settings ?? [], 'page.footer_text'))
             @if (!filled($footerText))

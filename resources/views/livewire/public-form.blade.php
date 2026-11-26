@@ -106,7 +106,7 @@
                 @php
                     $submitButtonText = $form->setting('submit_button');
                 @endphp
-                <button type="submit" wire:loading.attr="disabled" class="arqon-submit-button">
+                <button type="submit" wire:loading.attr="disabled" @if($preview) disabled title="Submissions are disabled in preview" @endif class="arqon-submit-button @if($preview) opacity-60 cursor-not-allowed @endif">
                     <span wire:loading.remove>{{ filled($submitButtonText) ? $submitButtonText : 'Submit' }}</span>
                     <span wire:loading class="arqon-submit-loading">
                         <svg class="arqon-submit-spinner" viewBox="0 0 24 24" fill="none">

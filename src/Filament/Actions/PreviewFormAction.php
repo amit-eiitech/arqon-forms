@@ -3,15 +3,18 @@
 namespace Arqon\Forms\Filament\Actions;
 
 use Arqon\Forms\Models\Form as FormModel;
+use Arqon\Forms\Traits\HasPackageIcons;
 use Filament\Actions\Action;
 
 class PreviewFormAction
 {
+    use HasPackageIcons;
+
     public static function make(): Action
     {
         return Action::make('preview')
             ->label('Preview')
-            ->icon('heroicon-o-eye')
+            ->icon(static::packageIcon('preview'))
             ->color('gray')
             ->modalHeading(fn(FormModel $record): string => $record->name)
             ->modalDescription(fn(FormModel $record): ?string => $record->description)

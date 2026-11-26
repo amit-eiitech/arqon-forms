@@ -7,15 +7,22 @@ use Arqon\Forms\Filament\Resources\Submissions\Pages\ViewSubmission;
 use Arqon\Forms\Filament\Resources\Submissions\Schemas\SubmissionInfolist;
 use Arqon\Forms\Filament\Resources\Submissions\Tables\SubmissionTable;
 use Arqon\Forms\Models\FormSubmission;
+use Arqon\Forms\Traits\HasPackageIcons;
+use BackedEnum;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
 use Filament\Tables\Table;
 
 class SubmissionResource extends Resource
 {
+    use HasPackageIcons;
+
     protected static ?string $model = FormSubmission::class;
 
-    protected static string | \BackedEnum | null $navigationIcon = 'heroicon-o-inbox';
+    public static function getNavigationIcon(): string|BackedEnum|null
+    {
+        return static::packageIcon('submissions');
+    }
 
     protected static ?string $recordTitleAttribute = 'id';
 

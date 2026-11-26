@@ -6,6 +6,7 @@ use Arqon\Forms\ArqonFormsServiceProvider;
 use Arqon\Forms\Filament\Actions\PreviewFormAction;
 use Arqon\Forms\Models\Form;
 use Filament\Actions\Action;
+use Filament\Support\Icons\Heroicon;
 use Livewire\LivewireServiceProvider;
 use Orchestra\Testbench\TestCase;
 
@@ -26,7 +27,7 @@ class PreviewFormActionTest extends TestCase
         self::assertInstanceOf(Action::class, $action);
         self::assertSame('preview', $action->getName());
         self::assertSame('Preview', $action->getLabel());
-        self::assertSame('heroicon-o-eye', $action->getIcon());
+        self::assertEquals(Heroicon::OutlinedEye, $action->getIcon());
         self::assertNull($action->getModalCancelAction());
         self::assertTrue($action->hasModalCloseButton());
         self::assertNull($action->getModalSubmitAction());

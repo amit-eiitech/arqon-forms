@@ -47,8 +47,8 @@ class PublicForm extends Component
             return;
         }
 
-        if ($this->preview && ! config('arqon-forms.preview.allow_submissions', false)) {
-            $this->addError('form', 'Preview mode is enabled. Submissions are disabled for preview links.');
+        if ($this->preview) {
+            $this->addError('form', 'Submissions are disabled in preview mode.');
             return;
         }
 

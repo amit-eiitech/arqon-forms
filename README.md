@@ -89,7 +89,6 @@ Arqon Forms includes an **In-Panel Modal Preview**:
 - Published forms have an **Open public form** action in the forms table.
 - The preview runs the real Livewire component with submissions disabled to prevent test pollution.
 - The modal matches your Filament panel theme with zero style bleed, honoring light and dark mode automatically.
-- Optional temporary signed preview URLs (`/forms/_preview/{id}`) remain available for external reviewers if enabled in config.
 
 ---
 
@@ -181,12 +180,42 @@ Key settings in `config/arqon-forms.php`:
 |---|---|---|
 | `route.prefix` | `'forms'` | URL prefix for public form endpoints |
 | `route.middleware` | `['web']` | Middleware applied to form routes |
-| `preview.enabled` | `true` | Enables temporary signed preview endpoints |
-| `preview.allow_submissions` | `false` | Whether submissions are allowed during preview |
 | `submission.rate_limit.max_attempts` | `5` | Maximum attempts per IP per decay window |
 | `submission.rate_limit.decay_minutes` | `1` | Decay window in minutes for rate limiting |
 | `submission.store_ip_hash` | `true` | Store salted HMAC IP hashes rather than raw IPs |
 | `notifications.delivery` | `'sync'` | Deliver notification emails via `'sync'` or `'queue'` |
+| `icons.*` | `null` | Custom Heroicon enum or string name for navigation and action icons |
+
+---
+
+## Icon Customization
+
+Arqon Forms uses the `HasPackageIcons` trait to resolve semantic icons for navigation and actions. You can customize any icon globally via `config/arqon-forms.php` using either Filament `Heroicon` enums or blade-heroicon string identifiers:
+
+```php
+use Filament\Support\Icons\Heroicon;
+
+'icons' => [
+    // Resource Navigation
+    'form' => Heroicon::OutlinedDocumentText,
+    'submissions' => Heroicon::OutlinedInbox,
+    'settings' => Heroicon::OutlinedCog6Tooth,
+
+    // Actions
+    'create' => Heroicon::OutlinedPlus,
+    'edit' => Heroicon::OutlinedPencilSquare,
+    'delete' => Heroicon::OutlinedTrash,
+    'view' => Heroicon::OutlinedEye,
+    'preview' => Heroicon::OutlinedEye,
+    'open_public_form' => Heroicon::OutlinedArrowTopRightOnSquare,
+    'mark_as_read' => Heroicon::OutlinedCheck,
+    'mark_as_replied' => Heroicon::OutlinedArrowUpRight,
+    'archive' => Heroicon::OutlinedArchiveBox,
+    'export_csv' => Heroicon::OutlinedArrowDownTray,
+],
+```
+
+Any key omitted or set to `null` automatically falls back to its default icon defined in `HasPackageIcons::defaultPackageIcons()`.
 
 For production, set a dedicated IP hash secret in `.env`:
 
