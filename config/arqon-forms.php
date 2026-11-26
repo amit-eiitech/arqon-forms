@@ -64,8 +64,4 @@ return [
         'archive' => null,
         'export_csv' => null,
     ],
-    'icons' => [
-        'form' => Heroicon::OutlinedRectangleStack,
-        'submissions' => Heroicon::OutlinedInbox,
-    ],
 ];
