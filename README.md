@@ -180,11 +180,22 @@ Key settings in `config/arqon-forms.php`:
 |---|---|---|
 | `route.prefix` | `'forms'` | URL prefix for public form endpoints |
 | `route.middleware` | `['web']` | Middleware applied to form routes |
+| `filament.navigation_group` | `'Forms'` | Filament navigation group for the Forms and Submissions resources |
+| `filament.forms_navigation_label` | `'Forms'` | Navigation label for the Forms resource |
+| `filament.submissions_navigation_label` | `'Submissions'` | Navigation label for the Submissions resource |
 | `submission.rate_limit.max_attempts` | `5` | Maximum attempts per IP per decay window |
 | `submission.rate_limit.decay_minutes` | `1` | Decay window in minutes for rate limiting |
 | `submission.store_ip_hash` | `true` | Store salted HMAC IP hashes rather than raw IPs |
 | `notifications.delivery` | `'sync'` | Deliver notification emails via `'sync'` or `'queue'` |
 | `icons.*` | `null` | Custom Heroicon enum or string name for navigation and action icons |
+
+To change the navigation group name, update `filament.navigation_group` in `config/arqon-forms.php`:
+
+```php
+'filament' => [
+    'navigation_group' => 'My Forms',
+],
+```
 
 ---
 
